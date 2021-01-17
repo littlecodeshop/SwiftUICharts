@@ -17,6 +17,7 @@ public struct LineChartStyle: ChartStyle {
     public let showLegends: Bool
     public let filled: Bool
     public let lineWidth: CGFloat
+    public let animationDuration: Double
     
     /**
      Creates new line chart style with the following parameters.
@@ -30,6 +31,8 @@ public struct LineChartStyle: ChartStyle {
      - showLegends: Bool value that controls whenever to show legends.
      - filled: Bool value that controls the filled aspect of the chart
      - lineWidth: the width of the line when drawing the line (filled = false)
+     - animationDuration: animation duration, set to 0 for instant effect
+
      
      */
     
@@ -41,7 +44,8 @@ public struct LineChartStyle: ChartStyle {
         labelCount: Int? = nil,
         showLegends: Bool = true,
         filled: Bool = true,
-        lineWidth: CGFloat = 5
+        lineWidth: CGFloat = 5,
+        animationDuration: Double = 0.0
     ) {
         self.lineMinHeight = lineMinHeight
         self.showAxis = showAxis
@@ -51,6 +55,7 @@ public struct LineChartStyle: ChartStyle {
         self.showLegends = showLegends
         self.filled = filled
         self.lineWidth = lineWidth
+        self.animationDuration = animationDuration
     }
 }
 
@@ -104,11 +109,14 @@ public struct LineChartView: View {
                 
                 if(style.filled) {
                     LineChartShape(dataPoints: dataPoints)
+                        .trim(from: 0, to: percentage)
                         .fill(gradient)
+                        .animation(.easeInOut(duration:style.animationDuration))
                         .frame(minHeight: style.lineMinHeight)
                         .background(grid)
                 } else {
                     LineChartShape(dataPoints: dataPoints, closePath: false)
+                        .trim(from: 0, to: percentage)
                         .stroke(gradient,
                                 style: StrokeStyle(
                                     lineWidth:style.lineWidth,
@@ -118,7 +126,7 @@ public struct LineChartView: View {
                                     
                                 )
                             )
-                        .animation(.easeOut(duration: 2.0))
+                        .animation(.easeOut(duration: style.animationDuration))
                         .frame(minHeight: style.lineMinHeight)
                         .background(grid)
                 }
@@ -151,7 +159,7 @@ struct LineChartView_Previews: PreviewProvider {
     static var previews: some View {
         HStack {
             LineChartView(dataPoints: DataPoint.mock)
-                .chartStyle(LineChartStyle(showAxis: false, showLabels: false))
+                .chartStyle(LineChartStyle(showAxis: false, showLabels: false, animationDuration: 3.0))
             LineChartView(dataPoints: DataPoint.mock).chartStyle(LineChartStyle(filled:false,lineWidth: 3))
         }
     }
