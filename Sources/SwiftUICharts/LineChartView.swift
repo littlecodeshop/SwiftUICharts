@@ -58,6 +58,7 @@ public struct LineChartStyle: ChartStyle {
 public struct LineChartView: View {
     @Environment(\.chartStyle) var chartStyle
     let dataPoints: [DataPoint]
+    @State private var percentage: CGFloat = .zero
     
     /**
      Creates new line chart view with the following parameters.
@@ -117,6 +118,7 @@ public struct LineChartView: View {
                                     
                                 )
                             )
+                        .animation(.easeOut(duration: 2.0))
                         .frame(minHeight: style.lineMinHeight)
                         .background(grid)
                 }
@@ -126,6 +128,8 @@ public struct LineChartView: View {
                         .accessibilityHidden(true)
                         .padding(.leading, style.axisLeadingPadding)
                 }
+            }.onAppear {
+                self.percentage = 1.0 // << activates animation for 0 to the end
             }
             
             if style.showLabels {
